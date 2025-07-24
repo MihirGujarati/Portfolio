@@ -1,0 +1,110 @@
+name: Step 3, Project Setup, Linting & Vite
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/steps/-step.txt'
+      - 'resources/Quiz3.md'
+      - 'vite.config.ts'
+      - 'tsconfig.json'
+      - 'package.json'
+      - 'src/**'
+      - 'index.html'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [check-chapter3]
+
+permissions:
+  contents: write
+
+jobs:
+  get_current_step:
+    name: Check current step number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_step
+        run: |
+          current_step=$(cat ./.github/steps/-step.txt)
+          echo "current_step=$current_step" >> $GITHUB_OUTPUT
+          if [ "$current_step" -eq "3" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      current_step: ${{ steps.get_step.outputs.current_step }}
+      should_run: ${{ steps.get_step.outputs.should_run }}
+
+  validate_and_progress:
+    name: Validate Quiz Answers and Progress
+    needs: get_current_step
+    if: >-
+      ${{ !github.event.repository.is_template
+          && needs.get_current_step.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate quiz answers
+        id: quiz_validation
+        run: |
+          QUIZ="resources/Quiz3.md"
+          if [ ! -f "$QUIZ" ]; then
+            echo "::error::$QUIZ is missing"
+            exit 1
+          fi
+          # Check for correct answers
+          INCORRECT=0
+          if ! grep -A5 "1. \*\*Which command scaffolds" "$QUIZ" | grep -q "\[X\] C. npm create vite@latest my-portfolio -- --template react-ts"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "2. \*\*In the Vite project structure" "$QUIZ" | grep -q "\[X\] C. src/main.tsx"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "3. \*\*Which file configures Tailwind" "$QUIZ" | grep -q "\[X\] B. tailwind.config.js"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi          
+          if [ "$INCORRECT" -gt 0 ]; then
+            echo "::error::Found $INCORRECT incorrect answers."
+            exit 1
+          fi
+          echo "quiz_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check Vite Project Files
+        id: vite_project
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: |
+          # Check for required Vite project files
+          REQUIRED_FILES=(
+            "vite.config.ts"
+            "tsconfig.json"
+            "package.json"
+            "index.html"
+            "src/main.tsx"
+            "src/App.tsx"
+            "src/index.css"
+          )          
+          MISSING_FILES=""
+          for file in "${REQUIRED_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING_FILES="$MISSING_FILES $file"
+            fi
+          done          
+          if [ ! -z "$MISSING_FILES" ]; then
+            echo "::error::Missing required files:$MISSING_FILES"
+            exit 1
+          fi          
+          echo "vite_project_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Update to Step 4
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.vite_project.outputs.vite_project_ok == 'true' && success()
+        uses: skills/action-update-step@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from_step: 3
+          to_step: 4
+          branch_name: ${{ github.ref_name }}

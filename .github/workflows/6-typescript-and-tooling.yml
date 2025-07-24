@@ -1,0 +1,231 @@
+name: Step 6, TypeScript & Tooling
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/steps/-step.txt'
+      - 'resources/Quiz6.md'
+      - 'tsconfig.json'
+      - 'tsconfig.app.json'
+      - 'tsconfig.node.json'
+      - 'eslint.config.js'
+      - 'src/types/**'
+      - 'src/data/**'
+      - 'src/assets/**'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [check-chapter6]
+
+permissions:
+  contents: write
+
+jobs:
+  get_current_step:
+    name: Check current step number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_step
+        run: |
+          current_step=$(cat ./.github/steps/-step.txt)
+          echo "current_step=$current_step" >> $GITHUB_OUTPUT
+          if [ "$current_step" -eq "5" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      current_step: ${{ steps.get_step.outputs.current_step }}
+      should_run: ${{ steps.get_step.outputs.should_run }}
+
+  validate_and_progress:
+    name: Validate Quiz Answers and Progress
+    needs: get_current_step
+    if: >
+      ${{ !github.event.repository.is_template
+          && needs.get_current_step.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Validate Quiz Answers
+        id: quiz_validation
+        run: |
+          QUIZ="resources/Quiz6.md"
+          if [ ! -f "$QUIZ" ]; then
+            echo "::error::$QUIZ is missing"
+            exit 1
+          fi
+          # Check for correct answers
+          INCORRECT=0
+          if ! grep -A5 "1. \*\*What does JSX stand for" "$QUIZ" | grep -q "\[X\] A. JavaScript XML"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "2. \*\*How do you define" "$QUIZ" | grep -q "\[X\] B. \`function MyComponent() { return <div/>; }\`"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "3. \*\*How are props accessed" "$QUIZ" | grep -q "\[X\] C. via the \`props\` parameter"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if [ "$INCORRECT" -gt 0 ]; then
+            echo "::error::Found $INCORRECT incorrect answers."
+            exit 1
+          fi
+          echo "quiz_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check TypeScript files
+        id: typescript_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: |
+          if [ ! -f "tsconfig.json" ]; then
+            echo "::error::tsconfig.json is missing"
+            exit 1
+          fi
+          if [ ! -f "tsconfig.app.json" ]; then
+            echo "::error::tsconfig.app.json is missing"
+            exit 1
+          fi
+          if [ ! -f "tsconfig.node.json" ]; then
+            echo "::error::tsconfig.node.json is missing"
+            exit 1
+          fi
+          if [ ! -f "src/types/index.ts" ]; then
+            echo "::error::src/types/index.ts is missing"
+            exit 1
+          fi
+          # Check for required interfaces
+          TYPE_CHECKS=(
+            "interface Social"
+            "interface PersonalInfo"
+            "interface EducationItem"
+            "interface Certification"
+            "interface Skill"
+            "interface ExperienceItem"
+            "interface Project"
+            "interface Achievement"
+          )          
+          MISSING=""
+          for check in "${TYPE_CHECKS[@]}"; do
+            if ! grep -q "$check" "src/types/index.ts"; then
+              MISSING="$MISSING\n- $check"
+            fi
+          done
+          if [ ! -z "$MISSING" ]; then
+            echo "::error::src/types/index.ts is missing required interfaces:$MISSING"
+            exit 1
+          fi
+          echo "typescript_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check Data Files
+        id: data_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.typescript_check.outputs.typescript_ok == 'true'
+        run: |
+          if [ ! -d "src/data/json" ]; then
+            echo "::error::src/data/json directory is missing"
+            exit 1
+          fi
+          JSON_FILES=$(find src/data/json -name "*.json" | wc -l)
+          if [ "$JSON_FILES" -lt 1 ]; then
+            echo "::error::No JSON data files found in src/data/json"
+            exit 1
+          fi
+          if [ ! -f "src/data/index.ts" ]; then
+            echo "::error::src/data/index.ts file is missing"
+            exit 1
+          fi
+          echo "data_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check Assets Directory
+        id: assets_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.data_check.outputs.data_ok == 'true'
+        run: |
+          if [ ! -d "src/assets" ]; then
+            echo "::error::src/assets directory is missing"
+            exit 1
+          fi
+          # Check for at least some assets
+          ASSET_COUNT=$(find src/assets -type f | wc -l)
+          if [ "$ASSET_COUNT" -lt 1 ]; then
+            echo "::error::No asset files found in src/assets directory."
+            exit 1
+          fi
+          echo "assets_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check ESLint Configuration
+        id: eslint_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.typescript_check.outputs.typescript_ok == 'true'
+        run: |
+          if [ ! -f "eslint.config.js" ]; then
+            echo "::error::eslint.config.js file is missing."
+            exit 1
+          fi          
+          # Check for TypeScript ESLint integration
+          if ! grep -q "typescript-eslint" "eslint.config.js"; then
+            echo "::error::eslint.config.js is missing TypeScript ESLint integration."
+            exit 1
+          fi          
+          echo "eslint_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check TypeScript Usage
+        id: ts_usage
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.eslint_check.outputs.eslint_ok == 'true'
+        run: |
+          # Check for TypeScript interfaces or types
+          if ! find src -name "*.ts" -o -name "*.tsx" | xargs grep -l "interface\|type\|React.FC" > /dev/null; then
+            echo "::error::No TypeScript interfaces, types, or React.FC found in source files."
+            exit 1
+          fi          
+          echo "ts_usage_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Install Dependencies
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: npm install
+
+      - name: Type Check
+        id: type_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: |
+          if npx tsc --noEmit; then
+            echo "type_check_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "::error::TypeScript type checking failed. Please fix the type errors."
+            exit 1
+          fi
+
+      - name: Run Lint Check
+        id: lint_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: |
+          if npm run lint; then
+            echo "lint_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Linting failed. Please fix the issues."
+            exit 1
+          fi
+
+      - name: Update to Step 7
+        if: >
+          steps.quiz_validation.outputs.quiz_ok == 'true' &&
+          steps.typescript_check.outputs.typescript_ok == 'true' &&
+          steps.data_check.outputs.data_ok == 'true' &&
+          steps.assets_check.outputs.assets_ok == 'true' &&
+          steps.eslint_check.outputs.eslint_ok == 'true' &&
+          steps.ts_usage.outputs.ts_usage_ok == 'true' &&
+          steps.type_check.outputs.type_check_ok == 'true' &&
+          steps.lint_check.outputs.lint_ok == 'true' &&
+          success()
+        uses: skills/action-update-step@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from_step: 6
+          to_step: 7
+          branch_name: ${{ github.ref_name }}

@@ -1,0 +1,139 @@
+name: Step 10, Accessible UI Components
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/steps/-step.txt'
+      - 'resources/Quiz10.md'
+      - 'package.json'
+      - 'src/components/**'
+  workflow_dispatch:
+  repository_dispatch:
+    types: [check-chapter10]
+
+permissions:
+  contents: write
+
+jobs:
+  get_current_step:
+    name: Check current step number
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - id: get_step
+        run: |
+          current_step=$(cat ./.github/steps/-step.txt)
+          echo "current_step=$current_step" >> $GITHUB_OUTPUT
+          if [ "$current_step" -eq "10" ]; then
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+    outputs:
+      current_step: ${{ steps.get_step.outputs.current_step }}
+      should_run: ${{ steps.get_step.outputs.should_run }}
+
+  validate_and_progress:
+    name: Validate Quiz Answers and Progress
+    needs: get_current_step
+    if: >
+      ${{ !github.event.repository.is_template
+          && needs.get_current_step.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Validate quiz answers
+        id: quiz_validation
+        run: |
+          QUIZ="resources/Quiz10.md"
+          if [ ! -f "$QUIZ" ]; then
+            echo "::error::$QUIZ is missing"
+            exit 1
+          fi
+          # Check for correct answers
+          INCORRECT=0
+          if ! grep -A5 "1. \*\*What is a controlled component" "$QUIZ" | grep -q "\[X\] B. A form element whose value is managed by React state"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "2. \*\*Which event handler attribute" "$QUIZ" | grep -q "\[X\] C. onChange"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if ! grep -A5 "3. \*\*Which library is designed" "$QUIZ" | grep -q "\[X\] B. Formik"; then 
+            INCORRECT=$((INCORRECT+1))
+          fi
+          if [ "$INCORRECT" -gt 0 ]; then
+            echo "::error::Found $INCORRECT incorrect answers."
+            exit 1
+          fi
+          echo "quiz_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check Package Dependencies
+        id: package_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: |
+          if [ ! -f "package.json" ]; then
+            echo "::error::package.json file is missing."
+            exit 1
+          fi          
+          # Check for required accessibility packages (at least one should be present)
+          if ! grep -q -E "@radix-ui|@shadcn|react-icons" "package.json"; then
+            echo "::error::Missing required accessibility packages in package.json. Expected at least one of: @radix-ui, @shadcn, or react-icons."
+            exit 1
+          fi
+          echo "package_ok=true" >> $GITHUB_OUTPUT
+
+      - name: Check Accessible Components
+        id: components_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.package_check.outputs.package_ok == 'true'
+        run: |
+          # Check for ARIA attributes in components
+          ARIA_COUNT=$(grep -r -E "aria-|role=" --include="*.tsx" src | wc -l)
+          if [ "$ARIA_COUNT" -eq 0 ]; then
+            echo "::error::No ARIA attributes found in components. Ensure you're using aria-label, role, or other accessibility attributes."
+            exit 1
+          fi          
+          # Check for usage of imported accessibility components
+          if ! grep -r -E "from (\"|\')@radix-ui|from (\"|\')@shadcn|from (\"|\')react-icons" --include="*.tsx" src | grep -q .; then
+            echo "::error::No usage of imported accessibility packages found in components."
+            exit 1
+          fi          
+          echo "components_ok=true" >> $GITHUB_OUTPUT
+      
+      - name: Install Dependencies
+        if: steps.quiz_validation.outputs.quiz_ok == 'true'
+        run: npm install
+
+      - name: Build Project
+        id: build_check
+        if: steps.quiz_validation.outputs.quiz_ok == 'true' && steps.components_check.outputs.components_ok == 'true'
+        run: |
+          if npm run build; then
+            echo "build_ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "::error::Build failed. Please fix the issues."
+            exit 1
+          fi
+
+      - name: Update to Step 11
+        if: >
+          steps.quiz_validation.outputs.quiz_ok == 'true' &&
+          steps.package_check.outputs.package_ok == 'true' &&
+          steps.components_check.outputs.components_ok == 'true' &&
+          steps.build_check.outputs.build_ok == 'true' &&
+          success()
+        uses: skills/action-update-step@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          from_step: 10
+          to_step: 11
+          branch_name: ${{ github.ref_name }}
