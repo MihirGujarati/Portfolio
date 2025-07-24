@@ -1,49 +1,150 @@
-name: Deploy Portfolio Website
+name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
+  
+# Define deployment environment variables
+env:
+  NODE_VERSION: 18
+  BUILD_DIR: ./dist/public # Adjusted to match your actual build output directory
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# Prevent concurrent deployments for safety
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
-      
-      - name: Setup Node
-        uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          cache: 'npm'
+          fetch-depth: 0
       
+      # Cache dependencies for faster workflows
+      - name: Setup Node.js cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
       - name: Install dependencies
         run: npm ci
-      
-      - name: Build
+        
+      - name: Build website
         run: npm run build
+        env:
+          NODE_ENV: production
+          # Add any environment variables your build might need
+          VITE_BASE_URL: "/${{ github.event.repository.name }}/"
+      
+      - name: Verify build output
+        run: |
+          if [ ! -d "${{ env.BUILD_DIR }}" ]; then
+            echo "::error::Build output directory '${{ env.BUILD_DIR }}' not found."
+            echo "Available directories:"
+            find ./dist -type d
+            exit 1
+          fi
+          
+          if [ ! -f "${{ env.BUILD_DIR }}/index.html" ]; then
+            echo "::error::index.html not found in build output directory."
+            echo "Files in build directory:"
+            find "${{ env.BUILD_DIR }}" -type f | sort
+            exit 1
+          fi
+      
+      - name: Create .nojekyll file
+        run: touch ${{ env.BUILD_DIR }}/.nojekyll
+      
+      - name: Add CNAME file if needed
+        # Uncomment and modify if you have a custom domain
+        # run: echo "your-custom-domain.com" > ${{ env.BUILD_DIR }}/CNAME
+        run: echo "No custom domain configured"
+        continue-on-error: true
+      
+      - name: Copy 404 page for SPA support
+        run: |
+          if [ -f "${{ env.BUILD_DIR }}/index.html" ]; then
+            cp "${{ env.BUILD_DIR }}/index.html" "${{ env.BUILD_DIR }}/404.html"
+          fi
+        continue-on-error: true
+      
+      - name: Optimize assets (images)
+        run: |
+          # Install image optimization tools
+          if [ -d "${{ env.BUILD_DIR }}/assets" ]; then
+            echo "Skipping image optimization in this run"
+            # Uncomment to enable image optimization
+            # sudo apt-get update && sudo apt-get install -y jpegoptim optipng
+            # find "${{ env.BUILD_DIR }}" -type f -name "*.jpg" -exec jpegoptim --strip-all --max=85 {} \;
+            # find "${{ env.BUILD_DIR }}" -type f -name "*.png" -exec optipng -quiet -strip all {} \;
+          fi
+        continue-on-error: true
+      
+      - name: Debug build information
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Build directory structure:"
+          find "${{ env.BUILD_DIR }}" -type f | head -n 30
+          echo "Index HTML content preview:"
+          head -n 15 "${{ env.BUILD_DIR }}/index.html"
+          echo "Total build size:"
+          du -sh "${{ env.BUILD_DIR }}"
+        continue-on-error: true
       
       - name: Setup Pages
-        uses: actions/configure-pages@v3
-      
+        id: pages
+        uses: actions/configure-pages@v4
+        
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
-  
+          path: ${{ env.BUILD_DIR }}
+          retention-days: 7
+
+  # Security scan job (optional but recommended)
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Run security scan
+        run: echo "Security scan placeholder - implement actual scanning as needed"
+        continue-on-error: true
+
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, security-scan]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}
+      
+      - name: Verify deployment
+        if: success()
+        run: |
+          echo "🚀 Deployment successful! Site available at ${{ steps.deployment.outputs.page_url }}"
+          # You could add automated checks here
