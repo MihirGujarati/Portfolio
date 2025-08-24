@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://yourusername.github.io/web-dev-skill",
+  "homepage": "https://mihirgujarati.github.io/Portfolio",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

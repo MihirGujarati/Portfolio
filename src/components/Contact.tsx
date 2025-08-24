@@ -186,6 +186,16 @@ const Contact: React.FC = () => {
                   <p>{personalInfo.email}</p>
                 </div>
               </div>
+              {/* Contact information */}
+              <div className="flex items-center">
+                <div className="w-10 h-10 flex items-center justify-center bg-blue-500/20 text-blue-500 dark:text-blue-400 rounded-full mr-3">
+                  📞
+                </div>
+                <div>
+                  <p className="text-gray-500 dark:text-gray-400">Phone no.</p>
+                  <p>{personalInfo.contact}</p>
+                </div>
+              </div>
             </div>
             {/* Social media links */}
             <h3 className="text-xl font-semibold mt-8 mb-4">Social Media</h3>
