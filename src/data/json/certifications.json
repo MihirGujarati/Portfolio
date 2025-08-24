@@ -1,26 +1,34 @@
 [
   {
     "id": "cert-1",
-    "name": "AWS Certified Solutions Architect - Associate",
-    "issuer": "Amazon Web Services",
-    "date": "January 2023",
-    "credentialId": "AWS-ASA-12345",
+    "name": "OSHA Outreach for the Construction Industry",
+    "issuer": "OSHA Education Center",
+    "date": "August 2025",
+    "credentialId": "20-0107970",
     "credentialUrl": ""
   },
   {
     "id": "cert-2",
-    "name": "Professional Front-End Developer Certification",
-    "issuer": "Meta",
-    "date": "June 2022",
-    "credentialId": "META-FED-67890",
-    "credentialUrl": ""
+    "name": "Procore Certified: Student",
+    "issuer": "Procore Technologies",
+    "date": "June 2025",
+    "credentialId": "nayjmtrtgw65",
+    "credentialUrl": "https://verify.skilljar.com/c/nayjmtrtgw65"
   },
   {
     "id": "cert-3",
-    "name": "React Native Specialization",
-    "issuer": "Coursera",
-    "date": "March 2021",
-    "credentialId": "COURSERA-RN-54321",
-    "credentialUrl": ""
+    "name": "Revit Families:- From Beginners to Pro",
+    "issuer": "Udemy",
+    "date": "December 2023",
+    "credentialId": "UC-9a4527c4-6720-4180-9c42-777d9ab7223",
+    "credentialUrl": "ude.my/Uc-9a4527 c4-d720-4180-9c42-7717d9ab7223"
+  },
+  {
+    "id": "cert-3",
+    "name": "Revit Families:- From Beginners to Pro",
+    "issuer": "Udemy",
+    "date": "December 2023",
+    "credentialId": "UC-9a4527c4-6720-4180-9c42-777d9ab7223",
+    "credentialUrl": "ude.my/Uc-9a4527 c4-d720-4180-9c42-7717d9ab7223"
   }
 ]

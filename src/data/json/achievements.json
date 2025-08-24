@@ -1,42 +1,74 @@
 [
   {
     "id": "ach-1",
-    "title": "Best Web Application Award",
-    "organization": "Arizona Web Development Conference",
-    "date": "November 2023",
-    "description": "Received first place award for developing an innovative accessibility-focused web application that helps visually impaired users navigate complex websites.",
-    "icon": "trophy"
-  },
-  {
-    "id": "ach-2",
-    "title": "Hackathon Winner",
-    "organization": "TechInnovate Hackathon",
-    "date": "May 2023",
-    "description": "Led a team of four developers to create a real-time collaboration tool that won first place among 50+ competing teams.",
-    "icon": "medal"
-  },
-  {
-    "id": "ach-3",
-    "title": "Open Source Contributor",
-    "organization": "React Community",
-    "date": "March 2022 - Present",
-    "description": "Recognized for significant contributions to React ecosystem projects, with over 50 merged pull requests and 10+ issues resolved.",
-    "icon": "award"
-  },
-  {
-    "id": "ach-4",
-    "title": "Published Technical Article",
-    "organization": "Web Development Journal",
-    "date": "January 2022",
-    "description": "Authored a technical article on modern state management techniques in React applications, which has been cited in multiple educational resources.",
+    "title": "OSHA Outreach for the Construction Industry",
+    "organization": "OSHA Education Cente",
+    "date": "Aug 2025",
+    "description": "Trained under OSHA Outreach Program for Construction, focusing on workplace safety standards and compliance.",
     "icon": "certificate"
   },
   {
+    "id": "ach-2",
+    "title": "Procore Certified: Student",
+    "organization": "Procore Technologies",
+    "date": "June 2025",
+    "description": "Certified in Procore (Student) with skills in construction project management and digital collaboration tools.",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-3",
+    "title": "Microsoft Excel for Construction Management",
+    "organization": "Udemy",
+    "date": "Aug 2025",
+    "description": "Microsoft Excel for Construction Management — applied Excel tools for efficient project planning and resource management.",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-4",
+    "title": "Generative AI Overview for Project Managers ",
+    "organization": "Project Management Institute",
+    "date": "Sep 2024",
+    "description": "Certified in Generative AI Overview for Project Managers with focus on AI applications in productivity and decision-making.",
+    "icon": "medal"
+  },
+  {
     "id": "ach-5",
+    "title": "Revit Families:- From Beginners to Pro",
+    "organization": "Udemy",
+    "date": "Dec 2023",
+    "description": "Revit Families: From Beginners to Pro — proficient in building intelligent, parametric content for advanced BIM workflows.",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-6",
+    "title": "Quantity Survey Estimation and Costing ",
+    "organization": "EmaxIndia",
+    "date": "Sep 2021",
+    "description": "Certified in Quantity Survey Estimation and Costing — skilled in material takeoffs, cost analysis, and budget preparation.",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-7",
+    "title": "Autodesk AutoCAD User Certification",
+    "organization": "CDAC GIST",
+    "date": "Dec 2020",
+    "description": "Autodesk AutoCAD Certified User — proficient in 2D drafting, technical drawings, and design documentation.",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-8",
+    "title": "The Complete Revit Course",
+    "organization": "Udemy",
+    "date": "Sep 2020",
+    "description": "Trained in The Complete Revit Course with skills in 3D modeling, parametric design, and construction documentation",
+    "icon": "certificate"
+  },
+  {
+    "id": "ach-9",
     "title": "Community Mentor Award",
     "organization": "Local Coding Bootcamp",
     "date": "August 2021",
     "description": "Recognized for exceptional mentorship provided to junior developers, helping them transition successfully into tech careers.",
-    "icon": "award"
+    "icon": "trophy"
   }
 ]
