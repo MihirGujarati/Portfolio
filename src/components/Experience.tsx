@@ -27,7 +27,7 @@ const Experience: React.FC = () => {
             My professional journey and the companies I've had the pleasure to work with.
           </p>
         </motion.div>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="relative pl-8 md:pl-0">
             {/* Vertical timeline line - visible only on medium screens and up */}
             <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-blue-500 via-blue-400 to-blue-500 shadow-lg shadow-blue-500/20"></div>
