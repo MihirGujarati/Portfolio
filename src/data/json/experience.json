@@ -1,44 +1,66 @@
 [
   {
     "id": "exp-1",
-    "role": "Senior Frontend Developer",
-    "company": "Tech Solutions Inc.",
-    "location": "Phoenix, AZ",
-    "period": "January 2023 - Present",
+    "role": "BIM Modeler",
+    "company": "UniquesCadd",
+    "location": "Ahmedabad, India",
+    "period": "August 2022 - July 2024",
     "description": [
-      "Led a team of 5 developers to build a responsive dashboard application using React and TypeScript",
-      "Implemented state management with Redux Toolkit, reducing code complexity by 30%",
-      "Established code quality standards with ESLint and Jest, achieving 90% test coverage",
-      "Collaborated with UX designers to implement an accessible UI system using Tailwind CSS"
+      "Produced 500+ detailed BIM models in Revit for commercial, residential, and mixed-use projects, cutting design-to-construction kickoff time by 30%",
+      "Led clash detection and scope validation processes, resolving 95% of conflicts before construction and saving significant rework costs",
+      "Standardized modeling practices by creating and maintaining a 100+ family Revit library, reducing modeling turnaround by 25%",
+      "Streamlined RFI workflows, improving response time across engineering and construction teams and minimizing schedule delays",
+      "Generated QA/QC compliance documentation and milestone deliverables that ensured adherence to project specifications",
+      "Mentored new hires and junior staff on BIM execution planning, boosting team efficiency and adoption of digital workflows",
+      "Championed BIM integration on 5 pilot projects—3 advanced to full-scale implementation, increasing firm-wide adoption of digital project delivery",
+      "Collaborated with architects, engineers, and contractors to ensure model accuracy and alignment with design intent",
+      "Implemented BIM-based quantity takeoffs and cost validations, improving estimating accuracy and reducing bid variances",
+      "Developed workflow documentation and project templates that reduced onboarding time for new projects by 15%"
     ],
-    "technologies": ["React", "TypeScript", "Redux", "Tailwind CSS", "Jest", "CI/CD"]
+    "technologies": [
+      "Autodesk Revit",
+      "Solibri Office",
+      "Navisworks",
+      "AutoCAD",
+      "Bluebeam",
+      "Procore",
+      "Microsoft Office Suite",
+      "QA/QC",
+      "RFI Management",
+      "BIM Execution Planning",
+      "Stakeholder Communication"
+    ]
   },
   {
     "id": "exp-2",
-    "role": "Frontend Developer",
-    "company": "Digital Innovations",
-    "location": "Remote",
-    "period": "June 2020 - December 2022",
+    "role": "Trainee Site Engineer",
+    "company": "Sanidhya Developers",
+    "location": "Gandhinagar, India",
+    "period": "May 2021 - June 2022",
     "description": [
-      "Developed and maintained multiple client websites using React and Next.js",
-      "Built reusable component libraries that reduced development time by 40%",
-      "Optimized site performance, improving Lighthouse scores by an average of 25 points",
-      "Integrated third-party APIs for payment processing and user authentication"
+      "Supervised daily site operations for a 14-story, 56-unit residential tower, coordinating subcontractors, material procurement, and logistics",
+      "Developed daily reports, look-ahead schedules, and billing documentation, improving project tracking and client reporting accuracy by 20%",
+      "Implemented site-wide safety plans and compliance checks, achieving zero major incidents across 70+ laborers and subcontractors",
+      "Facilitated collaboration between vendors, clients, and site teams, ensuring 98% of project activities were completed on or ahead of schedule",
+      "Oversaw soil compaction testing and concrete sampling with third-party labs, ensuring structural integrity and compliance with IS codes",
+      "Introduced lean inventory checks and reuse strategies, reducing material waste by 20% and lowering procurement costs",
+      "Assisted in preparing subcontractor bills and payment certificates, ensuring accuracy and timely disbursements",
+      "Monitored construction sequencing and resource allocation, helping mitigate schedule bottlenecks during structural works",
+      "Verified compliance of materials and workmanship with project specifications and quality standards",
+      "Participated in client meetings and site walkthroughs, supporting effective stakeholder communication and issue resolution"
     ],
-    "technologies": ["React", "Next.js", "JavaScript", "SCSS", "REST APIs", "Firebase"]
-  },
-  {
-    "id": "exp-3",
-    "role": "Web Developer Intern",
-    "company": "StartUp Hub",
-    "location": "Tempe, AZ",
-    "period": "January 2020 - May 2020",
-    "description": [
-      "Assisted in developing landing pages and marketing sites for early-stage startups",
-      "Gained experience with modern JavaScript frameworks and responsive design principles",
-      "Participated in daily stand-ups and agile development processes",
-      "Contributed to open-source projects to improve coding skills"
-    ],
-    "technologies": ["HTML", "CSS", "JavaScript", "Bootstrap", "Git", "WordPress"]
+    "technologies": [
+      "QA/QC",
+      "Field Testing Coordination",
+      "Concrete & Earthwork Inspection",
+      "RFI Management",
+      "Stakeholder Communication",
+      "Scope Development",
+      "Project Lifecycle Management",
+      "Risk Analysis",
+      "Estimating",
+      "Scheduling",
+      "Microsoft Office Suite"
+    ]
   }
 ]

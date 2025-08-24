@@ -12,6 +12,7 @@ export interface PersonalInfo {
   description: string;
   location: string;
   email: string;
+  contact: string;
   socials: Social[];
 }
 
